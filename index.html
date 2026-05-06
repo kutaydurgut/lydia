@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lydia | B2B Gold Trade Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Slate Gray (Professional/Tech), Amber/Gold (Jewellery/Gold), White/Off-white (Cleanliness/Trust) -->
+    <!-- Application Structure Plan: 
+         A unified, scrollable interactive dashboard. 
+         1. Hero/Executive Summary: Immediate value prop.
+         2. Problem & Solution Grid: Interactive flip cards or toggle to show how Lydia fixes the broken chain.
+         3. The Gold Loop (Business Model): Interactive cycle step-by-step to explain the operational flow clearly.
+         4. Investment & SAFE Calculator: Interactive tool for investors to calculate potential equity based on the £3M cap.
+         5. Target VC Landscape: A filterable, dynamic database of UK & Turkish VCs matching the exact profile of Lydia (B2B, Fintech, Marketplace, Seed stage), fulfilling the user's specific research request.
+         This structure moves the user from understanding the concept -> seeing the mechanics -> evaluating the deal -> actionable next steps (VC outreach).
+    -->
+    <!-- Visualization & Content Choices: 
+         - Problem/Solution: HTML/CSS toggle cards (Goal: Compare/Inform). Better than text blocks as it forces engagement.
+         - The Gold Loop: Interactive HTML flow (Goal: Process/Change). JS highlights steps. Avoids complex SVGs.
+         - SAFE Calculator: Chart.js Doughnut Chart (Goal: Inform/Compare). Shows visual equity distribution based on user input for investment amount.
+         - VC Database: HTML Grid with JS filtering (Goal: Organize/Inform). Allows quick sorting by geography and sector.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lydia: {
+                            dark: '#0f172a',    // slate-900
+                            gold: '#d97706',    // amber-600
+                            lightgold: '#fef3c7',// amber-50
+                            gray: '#f8fafc',    // slate-50
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 400px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 300px; 
+            max-height: 300px; 
+        }
+
+        /* Interactive Card Flip Styles */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+
+        /* Step active state */
+        .step-active { border-color: #d97706; background-color: #fef3c7; transform: scale(1.05); }
+        .step-inactive { border-color: #e2e8f0; background-color: white; opacity: 0.7; }
+    </style>
+</head>
+<body class="bg-lydia-gray text-slate-800 antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-8 h-8 rounded-full bg-lydia-gold text-white flex items-center justify-center font-bold text-xl">L</div>
+                    <span class="font-bold text-xl tracking-tight text-lydia-dark">LYDIA</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#problem-solution" class="text-sm font-medium text-slate-600 hover:text-lydia-gold transition">Platform</a>
+                    <a href="#gold-loop" class="text-sm font-medium text-slate-600 hover:text-lydia-gold transition">Business Model</a>
+                    <a href="#investment" class="text-sm font-medium text-slate-600 hover:text-lydia-gold transition">Investment</a>
+                    <a href="#vc-research" class="text-sm font-medium text-white bg-lydia-dark px-4 py-2 rounded-md hover:bg-slate-800 transition">VC Targets</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+        <div class="md:w-1/2 space-y-6">
+            <div class="inline-block px-3 py-1 rounded-full bg-lydia-lightgold text-lydia-gold text-sm font-semibold tracking-wide uppercase">
+                Seed Round 2025
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-lydia-dark leading-tight">
+                The Global B2B Gold Trade Platform
+            </h1>
+            <p class="text-xl text-slate-600">
+                Lydia is the operating system for the global jewellery industry. We connect Turkish manufacturers with European & Gulf jewellers through a secure, gold-denominated digital marketplace.
+            </p>
+            <div class="pt-4 flex gap-4">
+                <a href="#investment" class="bg-lydia-gold text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-700 transition shadow-lg shadow-amber-500/30">View Deal Terms</a>
+                <a href="#vc-research" class="bg-white border-2 border-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium hover:border-slate-300 transition">Explore VC Matches</a>
+            </div>
+        </div>
+        <div class="md:w-1/2 grid grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
+                <div class="text-3xl">🌍</div>
+                <div class="font-bold text-slate-800">Global Reach</div>
+                <div class="text-sm text-slate-500">Turkey, UK, Qatar, EU</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center space-y-2 translate-y-8">
+                <div class="text-3xl">🛡️</div>
+                <div class="font-bold text-slate-800">London HQ</div>
+                <div class="text-sm text-slate-500">Quality Control Layer</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center space-y-2 -translate-y-8">
+                <div class="text-3xl">📱</div>
+                <div class="font-bold text-slate-800">Fully Digital</div>
+                <div class="text-sm text-slate-500">iOS, Android, Web</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
+                <div class="text-3xl">🥇</div>
+                <div class="font-bold text-slate-800">Gold Standard</div>
+                <div class="text-sm text-slate-500">Gold-denominated trade</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem & Solution Section -->
+    <section id="problem-solution" class="py-20 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">Fixing a Broken Supply Chain</h2>
+                <p class="text-slate-400">Hover over the current industry problems to see how Lydia provides the structural solution.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="flip-card bg-transparent h-64 perspective-1000 cursor-pointer">
+                    <div class="flip-card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d">
+                        <div class="absolute w-full h-full backface-hidden bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">❌</div>
+                            <h3 class="text-lg font-bold text-red-400 mb-2">No Transparency</h3>
+                            <p class="text-sm text-slate-300">Buyers & manufacturers never meet. Trust relies purely on reputation.</p>
+                        </div>
+                        <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-lydia-dark border border-lydia-gold rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">🔒</div>
+                            <h3 class="text-lg font-bold text-lydia-gold mb-2">Anonymous B2B</h3>
+                            <p class="text-sm text-slate-300">Lydia holds relationships on both sides, ensuring secure, verified transactions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="flip-card bg-transparent h-64 perspective-1000 cursor-pointer">
+                    <div class="flip-card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d">
+                        <div class="absolute w-full h-full backface-hidden bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">💸</div>
+                            <h3 class="text-lg font-bold text-red-400 mb-2">Trapped Capital</h3>
+                            <p class="text-sm text-slate-300">Expensive gold inventory with no financing mechanism stalls growth.</p>
+                        </div>
+                        <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-lydia-dark border border-lydia-gold rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">⚡</div>
+                            <h3 class="text-lg font-bold text-lydia-gold mb-2">Gold-Denominated</h3>
+                            <p class="text-sm text-slate-300">Buyers pay in scrap gold. Currency risk is eliminated. Financing layer incoming.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flip-card bg-transparent h-64 perspective-1000 cursor-pointer">
+                    <div class="flip-card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d">
+                        <div class="absolute w-full h-full backface-hidden bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">🌍</div>
+                            <h3 class="text-lg font-bold text-red-400 mb-2">Fragmented Markets</h3>
+                            <p class="text-sm text-slate-300">Turkish manufacturers have no structured access to EU & Gulf buyers.</p>
+                        </div>
+                        <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-lydia-dark border border-lydia-gold rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">🏅</div>
+                            <h3 class="text-lg font-bold text-lydia-gold mb-2">London QA Layer</h3>
+                            <p class="text-sm text-slate-300">All goods pass through our UK HQ. We verify, approve, and route globally.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="flip-card bg-transparent h-64 perspective-1000 cursor-pointer">
+                    <div class="flip-card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d">
+                        <div class="absolute w-full h-full backface-hidden bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">📋</div>
+                            <h3 class="text-lg font-bold text-red-400 mb-2">Zero Digitisation</h3>
+                            <p class="text-sm text-slate-300">Orders and checks handled via WhatsApp, calls, and handshakes.</p>
+                        </div>
+                        <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-lydia-dark border border-lydia-gold rounded-xl p-6 flex flex-col justify-center">
+                            <div class="text-4xl mb-4">📱</div>
+                            <h3 class="text-lg font-bold text-lydia-gold mb-2">Full Platform</h3>
+                            <p class="text-sm text-slate-300">ERP integration, real-time tracking, apps for order management.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Gold Loop Section -->
+    <section id="gold-loop" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-lydia-dark mb-4">The Gold Loop</h2>
+                <p class="text-slate-600 max-w-2xl">A self-sustaining trade cycle. Click the steps below to see how Lydia orchestrates a secure transaction between a Turkish Manufacturer and a Global Jeweller.</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-center">
+                <!-- Interactive Steps -->
+                <div class="w-full lg:w-1/2 space-y-4 relative">
+                    <div class="absolute left-[23px] top-8 bottom-8 w-1 bg-slate-100 z-0 hidden sm:block"></div>
+                    
+                    <div id="step-1" class="loop-step step-active relative z-10 flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300" onclick="updateLoop(1)">
+                        <div class="w-12 h-12 rounded-full bg-lydia-gold text-white flex items-center justify-center font-bold text-xl flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">Manufacturer Ships</h4>
+                            <p class="text-sm text-slate-500">Turkish manufacturer ships finished jewellery.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="step-2" class="loop-step step-inactive relative z-10 flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300" onclick="updateLoop(2)">
+                        <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xl flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">Quality Control (London)</h4>
+                            <p class="text-sm text-slate-500">Lydia receives, verifies, and stocks inventory.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="step-3" class="loop-step step-inactive relative z-10 flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300" onclick="updateLoop(3)">
+                        <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xl flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">Jeweller Orders & Pays</h4>
+                            <p class="text-sm text-slate-500">EU/Gulf jeweller orders and delivers scrap gold.</p>
+                        </div>
+                    </div>
+
+                    <div id="step-4" class="loop-step step-inactive relative z-10 flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300" onclick="updateLoop(4)">
+                        <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xl flex-shrink-0">4</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">Loop Closes</h4>
+                            <p class="text-sm text-slate-500">Lydia pays manufacturer in gold, retaining a margin.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Detail Display -->
+                <div class="w-full lg:w-1/2 bg-slate-50 rounded-2xl p-8 border border-slate-200 min-h-[300px] flex flex-col justify-center shadow-inner">
+                    <div id="loop-display" class="text-center space-y-6 transition-opacity duration-300">
+                        <div class="text-6xl" id="loop-icon">📦</div>
+                        <h3 class="text-2xl font-bold text-lydia-dark" id="loop-title">Step 1: Inbound Inventory</h3>
+                        <p class="text-slate-600 text-lg" id="loop-desc">Our vetted network of Grand Bazaar and industrial producers in Turkey upload their digital catalogues. Upon agreement, physical goods are securely shipped to our holding facility.</p>
+                        <div class="inline-flex items-center gap-2 text-sm font-semibold text-lydia-gold bg-lydia-lightgold px-3 py-1 rounded-full">
+                            <span>Key Actor: Turkish Manufacturer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Investment / SAFE Calculator Section -->
+    <section id="investment" class="py-20 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-12 items-center">
+                
+                <div class="w-full lg:w-1/2 space-y-6">
+                    <h2 class="text-3xl font-bold text-lydia-dark">Investment Terms</h2>
+                    <p class="text-slate-600">We are raising a Seed round on a standard SAFE (Simple Agreement for Future Equity) to fuel our platform development and liquidity pool.</p>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="text-sm text-slate-500 font-medium">Target Raise</div>
+                            <div class="text-2xl font-bold text-lydia-dark">£250K – £500K</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="text-sm text-slate-500 font-medium">Valuation Cap</div>
+                            <div class="text-2xl font-bold text-lydia-dark">£3,000,000</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="text-sm text-slate-500 font-medium">Discount Rate</div>
+                            <div class="text-2xl font-bold text-lydia-dark">20%</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="text-sm text-slate-500 font-medium">Next Round Target</div>
+                            <div class="text-2xl font-bold text-lydia-dark">12–18 mos</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-lydia-dark text-white p-6 rounded-xl mt-6">
+                        <h4 class="font-bold text-lg mb-2">Interactive Equity Estimator</h4>
+                        <p class="text-sm text-slate-300 mb-4">Adjust the slider to see how your SAFE investment translates to estimated equity at the £3M Cap conversion event.</p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-end">
+                                <label for="investRange" class="block text-sm font-medium text-lydia-gold">Investment Amount: <span id="investValDisplay" class="text-white text-xl font-bold ml-2">£300,000</span></label>
+                            </div>
+                            <input type="range" id="investRange" min="50000" max="500000" step="10000" value="300000" class="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-lydia-gold">
+                            
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>£50K</span>
+                                <span>£500K</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-1/2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-center font-bold text-slate-700 mb-2">Estimated Cap Table (Post-Conversion at £3M Cap)</h3>
+                    <p class="text-center text-xs text-slate-500 mb-6">Assumes next equity round prices at or above the valuation cap.</p>
+                    
+                    <div class="chart-container flex items-center justify-center">
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-slate-600">Estimated Equity Share:</p>
+                        <p id="equityPercentage" class="text-4xl font-extrabold text-lydia-dark">10.0%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VC Research Database Section (Specifically generated per User Prompt) -->
+    <section id="vc-research" class="py-20 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 border-b border-slate-700 pb-6">
+                <div class="inline-flex items-center gap-2 bg-lydia-gold text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4">
+                    🔍 Founder Tools: VC Analysis
+                </div>
+                <h2 class="text-3xl font-bold mb-4">Target VC Landscape for Lydia</h2>
+                <p class="text-slate-400 max-w-3xl">
+                    Bu bölüm, talebiniz doğrultusunda özel olarak hazırlanmıştır. Lydia'nın B2B pazar yeri, fintech (altın ödeme altyapısı) ve tedarik zinciri odaklarına uygun, <strong>Türkiye ve İngiltere (UK)</strong> merkezli Seed/Erken aşama VC'lerin geniş taramasıdır.
+                </p>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-3 mb-8">
+                <button onclick="filterVC('All')" class="vc-filter-btn px-4 py-2 rounded-full border border-lydia-gold bg-lydia-gold text-white text-sm font-medium transition">Tümü (All)</button>
+                <button onclick="filterVC('UK')" class="vc-filter-btn px-4 py-2 rounded-full border border-slate-600 hover:border-lydia-gold text-slate-300 text-sm font-medium transition">🇬🇧 United Kingdom</button>
+                <button onclick="filterVC('TR')" class="vc-filter-btn px-4 py-2 rounded-full border border-slate-600 hover:border-lydia-gold text-slate-300 text-sm font-medium transition">🇹🇷 Türkiye</button>
+                <button onclick="filterVC('Fintech')" class="vc-filter-btn px-4 py-2 rounded-full border border-slate-600 hover:border-lydia-gold text-slate-300 text-sm font-medium transition">💳 Fintech Focus</button>
+                <button onclick="filterVC('Marketplace')" class="vc-filter-btn px-4 py-2 rounded-full border border-slate-600 hover:border-lydia-gold text-slate-300 text-sm font-medium transition">🛒 B2B Marketplace</button>
+            </div>
+
+            <!-- VC Grid -->
+            <div id="vc-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12 text-center text-slate-400">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="w-12 h-12 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xl mx-auto mb-4">L</div>
+            <h3 class="text-white font-bold text-lg">Lydia Jewellery</h3>
+            <p class="text-sm mt-2">London-based HQ · R&D team in Istanbul</p>
+            <p class="text-sm mt-1">fatih@lydiajewellery.com | NatWest Accelerator</p>
+            <div class="mt-8 pt-8 border-t border-slate-800 text-xs">
+                © 2025 Lydia. Confidential Pitch Material.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // --- 1. The Gold Loop Logic ---
+        const loopData = {
+            1: { icon: "📦", title: "Adım 1: Üretici Gönderimi (Manufacturer Ships)", desc: "Türk üretici, dijital katalog üzerinden sipariş edilen bitmiş takıları hazırlar. Lydia platformu üzerinden kargo ve lojistik entegrasyonu ile ürünler güvenli bir şekilde yola çıkar.", actor: "🇹🇷 Turkish Manufacturer" },
+            2: { icon: "🛡️", title: "Adım 2: Kalite Kontrol (London HQ)", desc: "Ürünler Lydia'nın Londra'daki merkezine ulaşır. Burada pazar standartlarına (ayar, işçilik) uygunluk kalite kontrolünden geçer ve sisteme onaylı envanter olarak işlenir.", actor: "🇬🇧 Lydia Quality Assurance" },
+            3: { icon: "🛒", title: "Adım 3: Sipariş & Altın Ödemesi (Jeweller Pays)", desc: "Avrupa veya Körfez bölgesindeki kuyumcu siparişi onaylar. Klasik para birimleri yerine sisteme 'hurda altın (scrap gold)' veya altın karşılığı bakiye ile ödeme yapar. Kur riski sıfırlanır.", actor: "🌍 EU / Gulf Jeweller" },
+            4: { icon: "🔄", title: "Adım 4: Döngünün Tamamlanması (Loop Closes)", desc: "Lydia, kendi ticaret marjını aldıktan sonra, üreticiye hak ettiği tutarı altın cinsinden (veya dijital altın bakiyesi olarak) aktarır. Sistem kendi kendini finanse eder.", actor: "⚙️ Platform Mechanism" }
+        };
+
+        function updateLoop(step) {
+            // Update UI styles
+            document.querySelectorAll('.loop-step').forEach(el => {
+                el.classList.remove('step-active');
+                el.classList.add('step-inactive');
+                el.querySelector('div').classList.replace('bg-lydia-gold', 'bg-slate-200');
+                el.querySelector('div').classList.replace('text-white', 'text-slate-600');
+            });
+            
+            const activeEl = document.getElementById(`step-${step}`);
+            activeEl.classList.remove('step-inactive');
+            activeEl.classList.add('step-active');
+            activeEl.querySelector('div').classList.replace('bg-slate-200', 'bg-lydia-gold');
+            activeEl.querySelector('div').classList.replace('text-slate-600', 'text-white');
+
+            // Update Content with fade effect
+            const display = document.getElementById('loop-display');
+            display.style.opacity = 0;
+            
+            setTimeout(() => {
+                document.getElementById('loop-icon').innerText = loopData[step].icon;
+                document.getElementById('loop-title').innerText = loopData[step].title;
+                document.getElementById('loop-desc').innerText = loopData[step].desc;
+                document.getElementById('loop-display').querySelector('span').innerText = `Key Actor: ${loopData[step].actor}`;
+                display.style.opacity = 1;
+            }, 300);
+        }
+
+        // --- 2. SAFE Calculator Logic (Chart.js) ---
+        const cap = 3000000; // £3M Cap
+        let investAmount = 300000; // Default
+        let equityChart;
+
+        function initChart() {
+            const ctx = document.getElementById('equityChart').getContext('2d');
+            equityChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Your Equity', 'Founders & Option Pool'],
+                    datasets: [{
+                        data: [10, 90], // Initial values for 300k
+                        backgroundColor: ['#d97706', '#e2e8f0'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCalculator() {
+            const range = document.getElementById('investRange');
+            investAmount = parseInt(range.value);
+            
+            // Format currency
+            document.getElementById('investValDisplay').innerText = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(investAmount);
+            
+            // Calculate Equity % (Simplified math for visual purposes: Invested / Post-Money Valuation Cap)
+            // Note: True SAFE math depends on pre/post money structure, this is an estimate based on £3M cap.
+            let equityPercent = (investAmount / cap) * 100;
+            equityPercent = Math.min(equityPercent, 100); // Cap at 100% just in case
+            
+            document.getElementById('equityPercentage').innerText = equityPercent.toFixed(1) + '%';
+            
+            // Update Chart
+            if(equityChart) {
+                equityChart.data.datasets[0].data = [equityPercent, 100 - equityPercent];
+                equityChart.update();
+            }
+        }
+
+        document.getElementById('investRange').addEventListener('input', updateCalculator);
+
+        // --- 3. VC Research Database Logic ---
+        const vcData = [
+            { name: "Speedinvest", country: "UK", flags: ["UK"], tags: ["Fintech", "Marketplace"], focus: "Avrupa ve İngiltere'de özellikle Fintech ve Network Effects (Pazar Yeri) için ayrı özel ekipleri var. Lydia'nın 'Gold-based financing layer' vizyonu tam onların Fintech tezine uygun.", stage: "Seed" },
+            { name: "Revo Capital", country: "TR", flags: ["TR"], tags: ["B2B", "Marketplace", "Fintech"], focus: "Türkiye'nin en büyük B2B teknoloji yatırımcılarından. Türkiye'den çıkıp global (Özellikle UK/Avrupa) pazarlara açılan startuplara odaklılar.", stage: "Seed / Series A" },
+            { name: "Seedcamp", country: "UK", flags: ["UK"], tags: ["Fintech", "B2B"], focus: "Avrupa'nın en prestijli Seed fonu. B2B altyapı ve Fintech projelerine çok sık yatırım yaparlar. Londra merkezli olmaları Lydia için büyük avantaj.", stage: "Pre-seed / Seed" },
+            { name: "212", country: "TR", flags: ["TR"], tags: ["B2B Marketplace", "Global Scale"], focus: "B2B pazar yerleri alanında ciddi tecrübeleri var. (Örn: Insider, Martı). Sadece global hedefleri olan Türk kuruculara yatırım yaparlar.", stage: "Late Seed / Series A" },
+            { name: "LocalGlobe", country: "UK", flags: ["UK"], tags: ["Marketplace", "Generalist"], focus: "Londra ekosisteminin merkezinde. Supply chain ve marketplace konularında çok agresif yatırım yaparlar. NatWest accelerator çıkışlı şirketleri severler.", stage: "Seed" },
+            { name: "Finberg", country: "TR", flags: ["TR"], tags: ["Fintech"], focus: "Fibabanka'nın yatırım kolu. Lydia'nın 'Monetary Metals' ve altın tabanlı finansman modeli Finberg'in geleneksel finans ile defi/alternatif finans köprüsü kurma hedefine çok uygun.", stage: "Seed" },
+            { name: "SFC Capital", country: "UK", flags: ["UK"], tags: ["SEIS", "Early Stage"], focus: "İngiltere'nin en aktif erken aşama fonu. £250K-£500K arası turlar için SEIS/EIS teşviklerini kullanan mükemmel bir lider yatırımcı adayıdır.", stage: "Pre-seed / Seed" },
+            { name: "ScaleX Ventures", country: "TR", flags: ["TR"], tags: ["B2B SaaS", "Supply Chain"], focus: "Derin B2B teknolojileri ve supply-chain optimizasyonu sağlayan platformlara (Lydia ERP entegrasyonu) ilgi duyarlar.", stage: "Seed" },
+            { name: "Antler UK", country: "UK", flags: ["UK"], tags: ["Early Stage", "Marketplace"], focus: "Day-zero veya erken tohum aşamasında yatırım yapan global bir fon. B2B trade platformlarına global networkleri ile büyük katkı sağlarlar.", stage: "Pre-seed / Seed" }
+        ];
+
+        function renderVCs(filter = "All") {
+            const grid = document.getElementById('vc-grid');
+            grid.innerHTML = '';
+            
+            vcData.forEach(vc => {
+                if (filter === "All" || vc.flags.includes(filter) || vc.tags.includes(filter)) {
+                    const tagHTML = vc.tags.map(t => `<span class="bg-slate-800 text-slate-300 text-xs px-2 py-1 rounded border border-slate-700">${t}</span>`).join('');
+                    const countryFlag = vc.country === "UK" ? "🇬🇧" : "🇹🇷";
+                    
+                    const card = `
+                        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-lydia-gold transition duration-300 flex flex-col h-full">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold text-white">${vc.name}</h3>
+                                <span class="text-2xl" title="${vc.country}">${countryFlag}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-lydia-dark text-lydia-gold text-xs px-2 py-1 rounded border border-lydia-gold/30">${vc.stage}</span>
+                                ${tagHTML}
+                            </div>
+                            <p class="text-sm text-slate-400 mb-4 flex-grow">
+                                <strong class="text-slate-300">Neden Uygun?</strong> ${vc.focus}
+                            </p>
+                            <button class="w-full mt-auto py-2 text-sm font-semibold text-lydia-dark bg-white hover:bg-lydia-gold hover:text-white rounded transition">İletişime Geç</button>
+                        </div>
+                    `;
+                    grid.innerHTML += card;
+                }
+            });
+        }
+
+        function filterVC(type) {
+            // Update button styles
+            document.querySelectorAll('.vc-filter-btn').forEach(btn => {
+                if(btn.innerText.includes(type) || (type==='All' && btn.innerText.includes('Tümü'))) {
+                    btn.classList.replace('bg-transparent', 'bg-lydia-gold');
+                    btn.classList.replace('border-slate-600', 'border-lydia-gold');
+                    btn.classList.replace('text-slate-300', 'text-white');
+                    btn.classList.add('bg-lydia-gold'); // safety
+                } else {
+                    btn.classList.remove('bg-lydia-gold');
+                    btn.classList.replace('border-lydia-gold', 'border-slate-600');
+                    btn.classList.replace('text-white', 'text-slate-300');
+                }
+            });
+            renderVCs(type);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            renderVCs();
+        });
+
+    </script>
+</body>
+</html>
